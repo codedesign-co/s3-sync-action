@@ -22,20 +22,6 @@ if [ -z "$AWS_REGION" ]; then
   AWS_REGION="us-east-1"
 fi
 
-if [ -z "$AWS_EXCLUDE" ]; then
-  EXCLUDE=""
-else
-  EXCLUDE=$(printf " --exclude %s" "${AWS_EXCLUDE[@]}" | cut -d "|" -f 1-${#AWS_EXCLUDE[@]})
-  AWS_EXCLUDE=""
-fi
-
-if [ -z "$AWS_INCLUDE" ]; then
-  INCLUDE=""
-else
-  INCLUDE=$(printf " --include %s" "${AWS_INCLUDE[@]}" | cut -d "|" -f 1-${#AWS_INCLUDE[@]})
-  AWS_INCLUDE=""
-fi
-
 # Override default AWS endpoint if user sets AWS_S3_ENDPOINT.
 if [ -n "$AWS_S3_ENDPOINT" ]; then
   ENDPOINT_APPEND="--endpoint-url $AWS_S3_ENDPOINT"
@@ -56,7 +42,7 @@ EOF
 sh -c "aws s3 sync ${SOURCE_DIR:-.} s3://${AWS_S3_BUCKET}/${DEST_DIR} \
               --profile s3-sync-action \
               --no-progress \
-              ${EXCLUDE}${INCLUDE}${ENDPOINT_APPEND} $*"
+              ${ENDPOINT_APPEND} $*"
 
 # Clear out credentials after we're done.
 # We need to re-run `aws configure` with bogus input instead of
